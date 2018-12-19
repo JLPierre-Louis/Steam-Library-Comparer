@@ -1,0 +1,15 @@
+{
+  "name": "steamproject",
+  "version": "1.0.0",
+  "description": "Compare Steam libraries",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "Luco",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^3.0.13",
+    "machinepack-steam": "^0.1.10"
+  }
+}
