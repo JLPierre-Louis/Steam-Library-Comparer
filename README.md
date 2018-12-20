@@ -11,7 +11,8 @@ Jean-Luc Pierre-Louis (jdpierrelouis@wpi.edu)
 4. Find ```var STEAM_API_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'``` in ```index.html``` and change the X's to your Steam API Key
 5. Open a command prompt
 6. Navigate to the project's folder wherever you put it using the command promt
-7. Enter ```npm start``` to run the application
+7. Run the command ```npm install electron -g``` to install electron globally
+8. Enter ```npm start``` to run the application
 
 ### Instructions for Using the Application
 
