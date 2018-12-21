@@ -8,7 +8,7 @@ Jean-Luc Pierre-Louis (jdpierrelouis@wpi.edu)
 1. Download the source code
 2. Download and install Node.js (https://nodejs.org/en/download/)
 3. Register a Steam API Key (https://steamcommunity.com/dev/apikey) (for address you can put 127.0.0.1)
-4. Find ```var STEAM_API_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'``` in ```index.html``` and change the X's to your Steam API Key
+4. Find ```var STEAM_API_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'``` in ```scripts/generate.js``` and change the X's to your Steam API Key
 5. Open a command prompt
 6. Navigate to the project's folder wherever you put it using the command promt
 7. Run the command ```npm install electron -g``` to install electron globally
