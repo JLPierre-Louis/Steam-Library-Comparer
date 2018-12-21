@@ -2,7 +2,7 @@
   "name": "steamproject",
   "version": "1.0.0",
   "description": "Compare Steam libraries",
-  "main": "main.js",
+  "main": "scripts/main.js",
   "scripts": {
     "start": "electron ."
   },

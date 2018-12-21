@@ -6,228 +6,27 @@
     <link rel="stylesheet" href="https://bootswatch.com/4/darkly/bootstrap.min.css">
   </head>
   <body>
+    <script src="scripts/generate.js"></script>
+    <link rel="stylesheet" href="style.css">
     <div class="container">
       <h1>Steam Library Comparer</h1>
       <div id="output"></div>
     </div>
-    <p id="numUsersInstructions">Enter the number of people you'd like to compare.</p>
-    <input type="text" id="oneTimeText" value="">
-    <button id="oneTimeButton" onclick="removeTemps()">Enter</button>
-    <p id="addUsersInstructions">Enter a Steam ID you'd like to add</p>
-    <input type="text" id="userBox" value="">
-    <button id="addUser" onclick="addUser()">Enter</button>
+    <div class="row">
+      <div class="column">
+        <div class="side" style="height:200px;width:450px;overflow:auto;border:8px solid #666699;padding:2%">
+          <h5 id="addUsersInstructions">Enter a Steam ID you'd like to add</h5>
+          <input type="text" id="userBox" value="">
+          <button class="button" id="addUser" onclick="addUser()">Enter</button>
+        </div>
+        <div style="height:500px;width:450px;overflow:auto;border:8px solid #666699;padding:2%">
+          <h2>Steam Users</h2>
+          <ul id="usersList"></ul>
+        </div>
+      </div>
+      <div id="main" class="main" style="height:700px;width:100px;overflow:auto;border:8px solid #666699;padding:2%">
+        <button class="button" id="generator" onclick="generateMatches()">Generate Matches</button>
+      </div>
+    </div>
   </body>
-
-  <script>
-    var Steam = require('machinepack-steam');
-    var STEAM_API_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'; // CHANGE THIS VARIABLE TO EQUAL YOUR STEAM API KEY
-    var ID = '';
-    var userCounter = 1;
-    var numUsers = 0;
-    var users = [];
-    var userLibraries = [];
-
-    function convertToAppId(games){
-      var newArray = games.map(function(x){
-        return x.appid;
-      })
-      return newArray;
-    }
-
-    function addUserHelper(aFieldChange, anID, aTextbox){
-      var username = "";
-      var profilePic = document.createElement("img");
-
-      Steam.getPlayerSummaries({
-        steamids: [ anID ],
-        key: STEAM_API_KEY,
-      }).exec({
-        error: function (err) {
-          console.log(err);
-        },
-        success: function (result) {
-          //console.log(result.players[0]);
-          username = result.players[0].personaname;
-          profilePic.src = result.players[0].avatarmedium;
-          aFieldChange.innerHTML = aFieldChange.innerHTML + " " + username + " ";
-          aFieldChange.appendChild(profilePic);
-        },
-       })
-
-      users.push(anID);
-      aTextbox.value  = "";
-      userCounter++;
-
-      Steam.getOwnedGames({
-        steamid: anID,
-        key: STEAM_API_KEY,
-        include_appinfo: 1,
-        include_played_free_games: 1,
-        appids_filter: [],
-      }).exec({
-        // unexpected error occurred
-        error: function (err) {
-          console.log(err);
-        },
-        // OK
-        success: function (result) {
-          userLibraries.push(convertToAppId(result.games));
-        },
-      });
-    }
-
-    function addUser() {
-      ID = document.getElementById("userBox").value;
-      var fieldChange = document.getElementById("User" + userCounter.toString());
-      var textbox = document.getElementById('userBox');
-      var button = document.getElementById('addUser');
-      var instructions = document.getElementById('addUsersInstructions');
-      var newButton = document.createElement("INPUT");
-
-      if(numUsers == 0) {
-        alert("Input number of users first!");
-      } else {
-        if(userCounter <= (numUsers - 1)) {
-          addUserHelper(fieldChange, ID, textbox);
-        } else if (userCounter == numUsers) {
-          addUserHelper(fieldChange, ID, textbox);
-          button.parentNode.removeChild(button);
-          textbox.parentNode.removeChild(textbox);
-          instructions.innerHTML = "Press the button to generate the matching games.";
-          newButton.setAttribute("type", "button");
-          newButton.setAttribute("value", "Generate Matches");
-          newButton.setAttribute("id", "generator");
-          newButton.setAttribute("onclick", "compareLibraries()");
-          document.body.appendChild(newButton);
-        }
-      }
-    }
-
-    function removeTemps() {
-      numUsers = document.getElementById('oneTimeText').value;
-      var button = document.getElementById('oneTimeText');
-      var textbox = document.getElementById('oneTimeButton');
-      var instructions = document.getElementById('numUsersInstructions');
-
-      if(parseInt(numUsers, 10) < 2 || numUsers == null || numUsers.localeCompare('') == 0) {
-        alert("Enter valid number of users! (2 or greater.)");
-      } else {
-        button.parentNode.removeChild(button);
-        textbox.parentNode.removeChild(textbox);
-        instructions.innerHTML = "You chose to compare " + numUsers + " users.";
-
-        var blockPar;
-        for (var i = 1; i <= parseInt(numUsers, 10); i++) {
-          blockPar = document.createElement("P");
-          blockPar.setAttribute("id", "User" + i.toString());
-          blockPar.innerHTML = i.toString() + ".";
-          document.body.appendChild(blockPar);
-        }
-
-        return false;
-      }
-    }
-
-    // finds the largest steam library to use as the main search
-    function findTheMain() {
-      var steamLibTotals = userLibraries.map(function(x) {
-        return x.length;
-      });
-      return steamLibTotals.indexOf(Math.max(...steamLibTotals));
-    }
-
-    function compareLibraries() {
-      var x = findTheMain();
-      var main = userLibraries[x];
-      var otherLibraries = userLibraries.splice(x, 1);
-      var matches = [];
-      var gamesList = [];
-      var img = document.createElement("img");
-      var list = document.createElement("ul");
-      var button = document.getElementById("generator");
-      var text = document.getElementById("addUsersInstructions");
-      var matchesHeader = document.createElement("P");
-
-      matchesHeader.innerHTML = "Steam library matches: ";
-      text.parentNode.removeChild(text);
-      button.parentNode.removeChild(button);
-      document.body.appendChild(matchesHeader);
-
-      for(var i = 0; i < main.length; i++) {
-        if((
-          userLibraries.map(function(arr) {
-          return arr.indexOf(main[i]);    }))
-          .indexOf(-1) == -1) {
-          matches.push(main[i]);
-        }
-      }
-
-      //console.log(matches);
-
-      /*
-
-      This is the code the Steam API gives to access game info
-      But it doens't work properly for some reason.
-      Not all the games show up
-
-      for(var i = 0; i < matches.length; i++) {
-        Steam.getSchemaForGame({
-          appid: matches[i],
-          key: STEAM_API_KEY,
-        }).exec({
-            error: function (err) {
-              console.log(err);
-            },
-            success: function (result) {
-              gamesList.push(result);
-            },
-        });
-      } */
-
-      Steam.getOwnedGames({
-        steamid: users[x],
-        key: STEAM_API_KEY,
-        include_appinfo: 1,
-        include_played_free_games: 1,
-        appids_filter: [],
-      }).exec({
-        // unexpected error occurred
-        error: function (err) {
-          console.log(err);
-        },
-        // OK
-        success: function (result) {
-          var allGames = result.games;
-          for(var i = 0; i < matches.length; i++) {
-            for(var j = 0; j < allGames.length; j++) {
-              if(allGames[j].appid == matches[i])
-                gamesList.push(allGames[j]);
-            }
-          }
-
-          if(gamesList.length > 0) {
-            for(var i = 0; i < gamesList.length; i++) {
-              var item = document.createElement("li");
-              var gameImg = document.createElement("img");
-              gameImg.src = "http://media.steampowered.com/steamcommunity/public/images/apps/" + gamesList[i].appid + "/" + gamesList[i].img_logo_url + ".jpg";
-              item.appendChild(gameImg);
-              item.appendChild(document.createTextNode(gamesList[i].name));
-              list.appendChild(item);
-            }
-          } else {
-            var noGames = document.createElement("li");
-            noGames.appendChild(document.createTextNode("Therer were no matching games found."));
-            list.appendChild(noGames);
-          }
-
-          document.body.appendChild(list);
-        },
-      });
-
-
-
-    }
-
-  </script>
-
 </html>

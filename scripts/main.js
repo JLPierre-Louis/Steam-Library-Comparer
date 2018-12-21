@@ -8,11 +8,11 @@ let win;
 
 function createWindow() {
   // Create browser window
-  win = new BrowserWindow({width:800, height:600, icon:__dirname+'/img/steam.png'})
+  win = new BrowserWindow({width:800, height:600, icon: path.join(__dirname, '..', '/img/steam.png')})
 
   // Load index.html
   win.loadURL(url.format({
-    pathname: path.join(__dirname, 'index.html'),
+    pathname: path.join(__dirname, '..', 'index.html'),
     protocol: 'file:',
     slashes: true
   }));
